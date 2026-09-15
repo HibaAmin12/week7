@@ -230,3 +230,167 @@ The CoT task produced the longest response and therefore had the highest measure
 - Prompt length and generated output can affect response time.
 - Response time should be compared carefully when the tasks or output lengths are different.
 - Ollama allows open-weight LLMs such as Llama 3.1 8B to be run locally without using a cloud API.
+
+
+# DeepSeek-R1:8B — Local Model Experiment
+
+## Model Setup
+
+After successfully installing and verifying Ollama, I pulled and ran the **DeepSeek-R1:8B** model locally.
+
+```bash
+ollama pull deepseek-r1:8b
+```
+
+The model was then started using:
+
+```bash
+ollama run deepseek-r1:8b
+```
+
+This successfully verified that DeepSeek-R1:8B was available and running locally through Ollama.
+
+---
+
+## Basic Model Verification
+
+To verify the model's understanding of LLM concepts, I tested it with the following prompt:
+
+```
+In the context of Large Language Models, explain what a Transformer is in simple words.
+```
+
+### Observation
+
+DeepSeek-R1:8B successfully explained the Transformer architecture and discussed concepts such as:
+
+- Self-attention
+- Relationships between tokens
+- Context understanding
+- Parallel processing
+- Transformer architecture in LLMs
+
+An important observation was that the model displayed a "Thinking..." section before providing its final response. This demonstrated the reasoning behavior of DeepSeek-R1.
+
+---
+
+## Chain-of-Thought / Reasoning Experiment
+
+To test reasoning behavior, I used a simple multi-step calculation problem.
+
+### Prompt
+
+```
+A customer bought 3 notebooks at $5 each and 2 pens at $2 each.
+They paid $25. How much change should they receive?
+Solve the problem step by step and provide the final answer.
+```
+
+### Model Reasoning
+
+The model calculated:
+
+```
+3 notebooks × $5 = $15
+2 pens × $2 = $4
+
+Total cost = $15 + $4 = $19
+
+Change = $25 - $19 = $6
+```
+
+### Final Answer
+
+```
+$6
+```
+
+The model correctly solved the problem and provided the intermediate calculations before the final answer.
+
+---
+
+## Unprompted Reasoning Experiment
+
+To compare the behavior, I ran the same type of problem without explicitly asking the model to solve it step by step.
+
+### Prompt
+
+```
+A customer bought 3 notebooks for $5 each and 2 pens for $2 each.
+They paid $25. How much change should they receive?
+Give the final answer.
+```
+
+### Observation
+
+Even though the prompt did not explicitly request step-by-step reasoning, DeepSeek-R1 still generated a visible "Thinking..." process before giving the final answer.
+
+The model again calculated:
+
+```
+3 × $5 = $15
+2 × $2 = $4
+
+Total = $19
+
+Change = $25 - $19 = $6
+```
+
+### Final Answer
+
+```
+$6
+```
+
+---
+
+## Response Time Measurement
+
+The response time was measured using Linux `/usr/bin/time`:
+
+```bash
+/usr/bin/time -f "Response time: %e seconds" ollama run deepseek-r1:8b "A customer bought 3 notebooks for \$5 each and 2 pens for \$2 each. They paid \$25. How much change should they receive? Give the final answer."
+```
+
+### Result
+
+```
+Response time: 83.82 seconds
+```
+
+---
+
+## Comparison with Llama 3.1 8B
+
+The earlier Chain-of-Thought experiment with Llama 3.1 8B produced the following result:
+
+| Model | Prompting | Response Time | Result |
+|---|---|---|---|
+| Llama 3.1 8B | Explicit CoT | 33.72 seconds | $6 |
+| DeepSeek-R1 8B | Unprompted reasoning | 83.82 seconds | $6 |
+
+### Observation
+
+Both models correctly solved the problem and produced the final answer of $6.
+
+DeepSeek-R1 generated an extended reasoning process even without explicitly requesting step-by-step reasoning. This resulted in a response time of 83.82 seconds in this experiment.
+
+The response time should not be interpreted as a general statement that one model is always slower than the other because response time can depend on the prompt, generated output length, reasoning process, and local hardware.
+
+---
+
+## Key Learning
+
+- DeepSeek-R1:8B can be run locally using Ollama.
+- DeepSeek-R1 demonstrated visible reasoning behavior during the experiments.
+- The model correctly solved a multi-step arithmetic problem.
+- Explicit Chain-of-Thought prompting can request step-by-step reasoning from a model.
+- DeepSeek-R1 showed reasoning behavior even when step-by-step reasoning was not explicitly requested.
+- Response time can increase when a model generates a longer reasoning process.
+- DeepSeek-R1 is designed as a reasoning-oriented model, which makes it useful for comparing trained reasoning behavior with prompted Chain-of-Thought reasoning.
+
+---
+
+## Conclusion
+
+The DeepSeek-R1:8B experiment successfully verified local deployment and reasoning behavior. The model correctly answered the test problem and demonstrated extended reasoning both with and without an explicit Chain-of-Thought instruction. The experiment also provided a practical comparison with Llama 3.1 8B in terms of reasoning behavior and response time.
