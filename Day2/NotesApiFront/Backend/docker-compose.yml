@@ -1,0 +1,50 @@
+services:
+
+  # ==========================================================
+  # PostgreSQL Database
+  # ==========================================================
+
+  db:
+    image: postgres:16
+
+    environment:
+      POSTGRES_USER: notes_user
+      POSTGRES_PASSWORD: notes_pass
+      POSTGRES_DB: notes_db
+
+    # Expose PostgreSQL to my local machine.
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+
+  # ==========================================================
+  # FastAPI Backend
+  # ==========================================================
+
+  api:
+    build: .
+
+    ports:
+      - "8000:8000"
+
+    environment:
+      DATABASE_URL: postgresql://notes_user:notes_pass@db:5432/notes_db
+
+    # Allow the FastAPI container to access
+    # services running on the host machine.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    depends_on:
+      - db
+
+
+# ==========================================================
+# PostgreSQL Persistent Volume
+# ==========================================================
+
+volumes:
+  postgres_data:
