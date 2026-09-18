@@ -1,3 +1,4 @@
+
 services:
 
   # ==========================================================
@@ -27,6 +28,11 @@ services:
   api:
     build: .
 
+    # Load API keys and other environment variables
+    # from the local .env file into the FastAPI container.
+    env_file:
+      - .env
+
     ports:
       - "8000:8000"
 
@@ -48,3 +54,6 @@ services:
 
 volumes:
   postgres_data:
+
+
+
